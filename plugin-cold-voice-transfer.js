@@ -21,8 +21,7 @@ export default class ColdQueueTransferPlugin extends FlexPlugin {
         this.registerReducers(manager);
 
         //replace the default TransferTask Action
-        flex.Actions.replaceAction("TransferTask", async (payload, original) => {
-
+        flex.Actions.replaceAction("TransferTask", async (payload, original) => {         
             //get customer Call SID from Task Attributes
             const customerCallSid = payload.task.attributes.conference.participants.customer
 
@@ -31,6 +30,9 @@ export default class ColdQueueTransferPlugin extends FlexPlugin {
 
             //store the TaskSID for reporting and logging
             const taskSid = payload.task._task.sid
+            
+            //logging
+            console.log(`DEBUG: Custom TransferTask triggered with ${taskSid} and ${targetSid}`)
 
             //set up parameters to pass to Twilio Function
             const body = {
@@ -56,6 +58,7 @@ export default class ColdQueueTransferPlugin extends FlexPlugin {
             try {
                 //only do this for COLD transfers to a TaskQueue
                 if (payload.options.mode === "COLD" && targetSid.substring(0, 2) === "WQ") {
+                    console.log(`DEBUG: Creating new TransferTask for originalTask ${taskSid} and going to Queue ${targetSid}`)
                     await fetch(transferCustomerCallFunctionUrl, httpOpts)
                 }
                 //if WARM or if to WORKER, default to original action
