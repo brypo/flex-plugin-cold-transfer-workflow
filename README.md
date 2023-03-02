@@ -14,7 +14,7 @@ This solution will solve this problem by sending COLD-transferred Tasks through 
 
 On the **front-end**, we use a [Flex Plugin](https://www.twilio.com/docs/flex/developer/ui-and-plugins) to replace the ["TransferTask" Action](https://www.twilio.com/docs/flex/developer/ui/v1/actions). If we detect the transfer is a COLD, Queue transfer for a Voice Task, then we make a request to a [Twilio Serverless Function](https://www.twilio.com/docs/serverless/functions-assets/functions) to handle the transfer in a custom way.
 
-On the **back-end**, from the Function, we update the customer's call leg with new TwiML instructions. The new TwiML tells the Call to [`<Enqueue>`](https://www.twilio.com/docs/voice/twiml/enqueue) to a new TaskRouter Workflow. Updating the Call cancels the original Task, and the <Enqueue> instruction created a new Task for the Call.
+On the **back-end**, from the Function, we update the customer's call leg with new TwiML instructions. The new TwiML tells the Call to [`<Enqueue>`](https://www.twilio.com/docs/voice/twiml/enqueue) to a new TaskRouter Workflow. Updating the Call cancels the original Task, and the `<Enqueue>` instruction created a new Task for the Call.
 
 
 ## Flex Plugin
