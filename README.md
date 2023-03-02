@@ -14,14 +14,14 @@ This solution will solve this problem by sending COLD-transferred Tasks through 
 
 On the **front-end**, we use a [Flex Plugin](https://www.twilio.com/docs/flex/developer/ui-and-plugins) to replace the ["TransferTask" Action](https://www.twilio.com/docs/flex/developer/ui/v1/actions). If we detect the transfer is a COLD, Queue transfer for a Voice Task, then we make a request to a [Twilio Serverless Function](https://www.twilio.com/docs/serverless/functions-assets/functions) to handle the transfer in a custom way.
 
-On the **back-end**, from the Function, we update the customer's call leg with new TwiML instructions. The new TwiML tells the Call to [`<Enqueue>`](https://www.twilio.com/docs/voice/twiml/enqueue) to a new TaskRouter Workflow. Updating the Call cancels the original Task, and the `<Enqueue>` instruction created a new Task for the Call.
+On the **back-end**, from the Function, we update the customer's call leg with new TwiML instructions. The new TwiML tells the Call to [`<Enqueue>`](https://www.twilio.com/docs/voice/twiml/enqueue) to a new TaskRouter Workflow. Updating the Call cancels the original Task, and the `<Enqueue>` instruction creates a new Task for the Call.
 
 
 ## Flex Plugin
 
 The code provided is intended to be incorporated into standard plugin architecture.
 
-To get started, follow these instructions to [set up a sample Flex plugin](https://www.twilio.com/docs/flex/quickstart/getting-started-plugin#set-up-a-sample-flex-plugin), navigate to the [main part](https://www.twilio.com/docs/flex/quickstart/getting-started-plugin#build-your-flex-plugin) of your plugin, and replace the `src/SamplePlugin.js` code with what's provided in the above *plugin* file.'
+To get started, follow these instructions to [set up a sample Flex plugin](https://www.twilio.com/docs/flex/quickstart/getting-started-plugin#set-up-a-sample-flex-plugin), navigate to the [main part](https://www.twilio.com/docs/flex/quickstart/getting-started-plugin#build-your-flex-plugin) of your plugin, and replace the `src/SamplePlugin.js` code with what's provided in the above *plugin* file.
 
 ### Plugin Environment Variables
 
@@ -39,7 +39,7 @@ A Serverless Function is used to process the custom Task logic.
 | Variable | Example Identifier |
 | ----- | ---- |
 | `EVERYONE_WORKFLOW_SID` | WWxxxxxxxxxx |
-| `EVERYONE_QUEUE_SID' | WQxxxxxxxx |
+| `EVERYONE_QUEUE_SID` | WQxxxxxxxx |
 
 
 ## Disclaimer
