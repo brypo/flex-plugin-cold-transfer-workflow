@@ -25,7 +25,7 @@ To get started, follow these instructions to [set up a sample Flex plugin](https
 
 ### Plugin Environment Variables
 
-This Plugin is using an environment variable defined in the `.env` file. This stores the deployed Serverless Function URL:
+This Plugin is using an environment variable defined in a `.env` file. This stores the deployed Serverless Function URL:
 `process.env.TWILIO_FUNCTION_URL_TRANSFERS` = URL to your Serverless Function
 
 To learn more about setting up Environment Variables in a Flex Plugin, check out [this doc](https://www.twilio.com/docs/flex/developer/plugins/environment-variables#:~:text=Keep%20in%20mind%20that%20the%20environment%20variable%20names%20are%20required%20to%20start%20with%20TWILIO_%2C%20FLEX_%20or%20REACT_).
