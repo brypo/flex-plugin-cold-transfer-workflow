@@ -1,6 +1,7 @@
 import React from 'react';
 import { VERSION, TaskHelper } from '@twilio/flex-ui';
 import { FlexPlugin } from '@twilio/flex-plugin';
+import reducers, { namespace } from './states';
 
 const PLUGIN_NAME = 'ColdQueueTransferPlugin';
 
