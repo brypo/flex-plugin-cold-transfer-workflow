@@ -1,6 +1,6 @@
 import React from 'react';
 import { VERSION, TaskHelper } from '@twilio/flex-ui';
-import { FlexPlugin } from '@twilio/flex-plugin';
+import { FlexPlugin, TaskHelper } from '@twilio/flex-plugin';
 
 const PLUGIN_NAME = 'ColdQueueTransferPlugin';
 
