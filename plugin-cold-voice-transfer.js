@@ -21,7 +21,10 @@ export default class ColdQueueTransferPlugin extends FlexPlugin {
         this.registerReducers(manager);
 
         //replace the default TransferTask Action
-        flex.Actions.replaceAction("TransferTask", async (payload, original) => {         
+        flex.Actions.replaceAction("TransferTask", async (payload, original) => {  
+            // assign the Twilio Serverless Function URL to a variable
+            const transferCustomerCallFunctionUrl = process.env.TWILIO_FUNCTION_URL_TRANSFERS //replace with your URL after deployment of Function
+            
             //get customer Call SID from Task Attributes
             const customerCallSid = payload.task.attributes.conference.participants.customer
 
@@ -41,9 +44,6 @@ export default class ColdQueueTransferPlugin extends FlexPlugin {
                 TaskQueueSid: targetSid,
                 TaskSid: payload.task._task.sid
             }
-
-            // get url for Twilio Function from environment variable
-            const transferCustomerCallFunctionUrl = process.env.TWILIO_FUNCTION_URL_TRANSFERS
 
             // set up request options
             const httpOpts = {
