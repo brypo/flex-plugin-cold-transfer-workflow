@@ -57,7 +57,7 @@ export default class ColdQueueTransferPlugin extends FlexPlugin {
             // try to do a custom transfer by making a request to the Twilio Function
             try {
                 //only do this for COLD Voice transfers to a TaskQueue
-                if (TaskHelper.isCallTask(payload.task) && payload.taskpayload.options.mode === "COLD" && targetSid.substring(0, 2) === "WQ") {
+                if (TaskHelper.isCallTask(payload.task) && payload.options.mode === "COLD" && targetSid.substring(0, 2) === "WQ") {
                     console.log(`DEBUG: Creating new TransferTask for originalTask ${taskSid} and going to Queue ${targetSid}`)
                     await fetch(transferCustomerCallFunctionUrl, httpOpts)
                 }
