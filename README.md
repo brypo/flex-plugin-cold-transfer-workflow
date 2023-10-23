@@ -19,9 +19,9 @@ On the **back-end**, from the Function, we update the customer's call leg with n
 
 ## Flex Plugin
 
-The code provided is intended to be incorporated into standard plugin architecture.
+The code provided is intended to be incorporated into standard plugin architecture. 
 
-To get started, follow these instructions to [set up a sample Flex plugin](https://www.twilio.com/docs/flex/quickstart/getting-started-plugin#set-up-a-sample-flex-plugin), navigate to the [main part](https://www.twilio.com/docs/flex/quickstart/getting-started-plugin#build-your-flex-plugin) of your plugin, and replace the `src/SamplePlugin.js` code with what's provided in the above *plugin* file.
+If this is your first or only plugin, follow these instructions to [set up a sample Flex plugin](https://www.twilio.com/docs/flex/quickstart/getting-started-plugin#set-up-a-sample-flex-plugin), navigate to the [main part](https://www.twilio.com/docs/flex/quickstart/getting-started-plugin#build-your-flex-plugin) of your plugin, and locate the the `src/SamplePlugin.js` file. In this file, we'll replace the `async init()` block with the one provided in the code sample in this repo (`plugin-cold-voice-transfer.js`).
 
 ### Plugin Environment Variables
 
