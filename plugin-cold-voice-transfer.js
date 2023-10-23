@@ -1,94 +1,61 @@
-import React from 'react';
-import { VERSION, TaskHelper } from '@twilio/flex-ui';
-import { FlexPlugin } from '@twilio/flex-plugin';
-import reducers, { namespace } from './states';
+/**
+intended to be used with Flex UI v2.x
+**/
 
-const PLUGIN_NAME = 'ColdQueueTransferPlugin';
+async init(flex, manager) {
+    
+    //replace the default TransferTask Action
+    flex.Actions.replaceAction("TransferTask", async (payload, original) => {  
+        // assign the Twilio Serverless Function URL to a variable
+        const transferCustomerCallFunctionUrl = process.env.TWILIO_FUNCTION_URL_TRANSFERS //replace with your URL after deployment of Function
+        
+        //get customer Call SID from Task Attributes
+        const customerCallSid = payload.task.attributes.conference.participants.customer
 
-export default class ColdQueueTransferPlugin extends FlexPlugin {
-    constructor() {
-        super(PLUGIN_NAME);
-    }
+        //get the TaskQueueSID or WorkerSID from the transfer request
+        const { targetSid } = payload
 
-    /**
-     * This code is run when your plugin is being started
-     * Use this to modify any UI components or attach to the actions framework
-     *
-     * @param flex { typeof import('@twilio/flex-ui') }
-     * @param manager { import('@twilio/flex-ui').Manager }
-     */
+        //store the TaskSID for reporting and logging
+        const taskSid = payload.task._task.sid
+        
+        //logging
+        console.log(`DEBUG: Custom TransferTask triggered with ${taskSid} and ${targetSid}`)
 
-    async init(flex, manager) {
-        this.registerReducers(manager);
-
-        //replace the default TransferTask Action
-        flex.Actions.replaceAction("TransferTask", async (payload, original) => {  
-            // assign the Twilio Serverless Function URL to a variable
-            const transferCustomerCallFunctionUrl = process.env.TWILIO_FUNCTION_URL_TRANSFERS //replace with your URL after deployment of Function
-            
-            //get customer Call SID from Task Attributes
-            const customerCallSid = payload.task.attributes.conference.participants.customer
-
-            //get the TaskQueueSID or WorkerSID from the transfer request
-            const { targetSid } = payload
-
-            //store the TaskSID for reporting and logging
-            const taskSid = payload.task._task.sid
-            
-            //logging
-            console.log(`DEBUG: Custom TransferTask triggered with ${taskSid} and ${targetSid}`)
-
-            //set up parameters to pass to Twilio Function
-            const body = {
-                Token: manager.store.getState().flex.session.ssoTokenPayload.token,
-                CallSid: customerCallSid,
-                TaskQueueSid: targetSid,
-                TaskSid: payload.task._task.sid
-            }
-
-            // set up request options
-            const httpOpts = {
-                method: 'POST',
-                body: new URLSearchParams(body),
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                }
-            }
-
-            // try to do a custom transfer by making a request to the Twilio Function
-            try {
-                //only do this for COLD Voice transfers to a TaskQueue
-                if (payload.task.taskChannelUniqueName === "voice" && payload.options.mode === "COLD" && targetSid.substring(0, 2) === "WQ") {
-                    console.log(`DEBUG: Creating new TransferTask for originalTask ${taskSid} and going to Queue ${targetSid}`)
-                    await fetch(transferCustomerCallFunctionUrl, httpOpts)
-                }
-                //if WARM or if to WORKER, default to original action
-                else {
-                    await original(payload)
-                }
-
-            }
-            // log the error
-            catch (e) {
-                console.error(`Failed to transfer call ${customerCallSid} ${taskSid}.`)
-                console.error(e)
-            }
-        })
-
-    }
-
-    /**
-     * Registers the plugin reducers
-     *
-     * @param manager { Flex.Manager }
-     */
-    registerReducers(manager) {
-        if (!manager.store.addReducer) {
-            // eslint-disable-next-line
-            console.error(`You need FlexUI > 1.9.0 to use built-in redux; you are currently on ${VERSION}`);
-            return;
+        //set up parameters to pass to Twilio Function
+        const body = {
+            Token: manager.store.getState().flex.session.ssoTokenPayload.token,
+            CallSid: customerCallSid,
+            TaskQueueSid: targetSid,
+            TaskSid: payload.task._task.sid
         }
 
-        manager.store.addReducer(namespace, reducers);
-    }
+        // set up request options
+        const httpOpts = {
+            method: 'POST',
+            body: new URLSearchParams(body),
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            }
+        }
+
+        // try to do a custom transfer by making a request to the Twilio Function
+        try {
+            //only do this for COLD Voice transfers to a TaskQueue
+            if (payload.task.taskChannelUniqueName === "voice" && payload.options.mode === "COLD" && targetSid.substring(0, 2) === "WQ") {
+                console.log(`DEBUG: Creating new TransferTask for originalTask ${taskSid} and going to Queue ${targetSid}`)
+                await fetch(transferCustomerCallFunctionUrl, httpOpts)
+            }
+            //if WARM or if to WORKER, default to original action
+            else {
+                await original(payload)
+            }
+
+        }
+        // log the error
+        catch (e) {
+            console.error(`Failed to transfer call ${customerCallSid} ${taskSid}.`)
+            console.error(e)
+        }
+    })
+
 }
