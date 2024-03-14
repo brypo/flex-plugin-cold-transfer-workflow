@@ -19,9 +19,10 @@ On the **back-end**, from the Function, we update the customer's call leg with n
 
 ## Flex Plugin
 
-The code provided is intended to be incorporated into standard plugin architecture. 
+The code provided is intended to be incorporated into standard Flex Plugin architecture. 
 
-If this is your first or only plugin, follow these instructions to [set up a sample Flex plugin](https://www.twilio.com/docs/flex/quickstart/getting-started-plugin#set-up-a-sample-flex-plugin), navigate to the [main part](https://www.twilio.com/docs/flex/quickstart/getting-started-plugin#build-your-flex-plugin) of your plugin, and locate the the `src/SamplePlugin.js` file. In this file, we'll replace the `async init()` block with the one provided in the code sample in this repo (`plugin-cold-voice-transfer.js`).
+If you are new to Flex Plugins, follow these instructions to [set up a sample Flex plugin](https://www.twilio.com/docs/flex/quickstart/getting-started-plugin#set-up-a-sample-flex-plugin), navigate to the [`init` method](https://www.twilio.com/docs/flex/quickstart/getting-started-plugin#build-your-flex-plugin) of your plugin, and add the [sample code provided](https://github.com/brypo/flex-plugin-cold-transfer-workflow/blob/main/plugin-cold-voice-transfer.js). 
+
 
 ### Plugin Environment Variables
 
@@ -50,3 +51,4 @@ This Function uses the Flex Token Validator library, as explained this in this [
 
 ## Disclaimer
 This software is to be considered "sample code", a Type B Deliverable, and is delivered "as-is" to the user. Twilio bears no responsibility to support the use or implementation of this software.
+ponsibility to support the use or implementation of this software.
