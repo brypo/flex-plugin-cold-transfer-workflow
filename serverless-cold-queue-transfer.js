@@ -2,63 +2,53 @@ const TokenValidator = require('twilio-flex-token-validator').functionValidator;
 
 exports.handler = TokenValidator(async function (context, event, callback) {
     const client = context.getTwilioClient();
-    const twiml = new Twilio.twiml.VoiceResponse();
     const { CallSid, TaskQueueSid, TaskSid } = event;
 
-    // Create a custom Twilio Response
-    // Set the CORS headers to allow Flex to make an HTTP request to the Twilio Function
+    console.log(`[ColdTransfer] Received transfer request — CallSid=${CallSid}, TaskSid=${TaskSid}, TaskQueueSid=${TaskQueueSid}`);
+
     const response = new Twilio.Response();
-    response.appendHeader('Access-Control-Allow-Origin', '*');
+    response.appendHeader('Access-Control-Allow-Origin', '*'); 
     response.appendHeader('Access-Control-Allow-Methods', 'OPTIONS POST GET');
     response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    //get variables from context
-    //this example has a 1:1 mapping for Queue=>Workflow
-    const EveryoneQueue = context.EVERYONE_QUEUE_SID  //"Everyone Queue"
-    const EveryoneWorkflowSid = context.EVERYONE_WORKFLOW_SID // Transfer "Workflow" for this Queue
-
-    //create a taskqueue to workflow map
+    // 1:1 mapping of TaskQueue SID => Workflow SID
+    // To support more queues, add entries here: [context.OTHER_QUEUE_SID]: context.OTHER_WORKFLOW_SID
     const workflows = {
-        [EveryoneQueue]: EveryoneWorkflowSid
+        [context.EVERYONE_QUEUE_SID]: context.EVERYONE_WORKFLOW_SID
     };
 
-    //set transfer (new task) attributes for logging
+    const workflowSid = workflows[TaskQueueSid];
+
+    if (!workflowSid) {
+        console.error(`[ColdTransfer] No workflow mapped for queue ${TaskQueueSid}. Known queues: ${Object.keys(workflows).join(', ')}. Returning 400.`);
+        response.setStatusCode(400);
+        return callback(null, response);
+    }
+
     const transferAttributes = JSON.stringify({
         originalTask: TaskSid,
         isTransfer: true,
         transferredAt: Date.now(),
-        conversation: {
-            conversation_id: TaskSid
-        }
+        conversation: { conversation_id: TaskSid }
     });
 
-    //choose workflow to transfer to based on selected transfer taskqueue
-    const workflowSid = workflows[TaskQueueSid];
-    console.log(`TaskQueue ${TaskQueueSid} matched with Workflow: ${workflowSid}`);
-
-    //set up twiml to use on the Call update
+    const twiml = new Twilio.twiml.VoiceResponse();
     twiml
-        .enqueue({
-            workflowSid: workflowSid,
-        })
-        .task({
-            priority: '150' //optional - higher priority for transfers
-        }, transferAttributes)
+        .enqueue({ workflowSid })
+        .task({ priority: 150 }, transferAttributes); // elevated priority so transfers are picked up before new inbound tasks
 
-    console.log(`Transferring customer call ${CallSid} with new TwiML ${twiml.toString()}`);
+    const twimlString = twiml.toString();
+    console.log(`[ColdTransfer] Updating call ${CallSid} with TwiML: ${twimlString}`);
 
     try {
-        const updatedCall = await client.calls(CallSid)
-            .update({ twiml: twiml.toString() })
-
-        if (updatedCall) {
-            console.log("Successfully updated call ", updatedCall.sid);
-            return callback(null, response);
-        }
-    }
-    catch (e) {
-        console.error(e);
+        const updatedCall = await client.calls(CallSid).update({ twiml: twimlString });
+        console.log(`[ColdTransfer] Successfully updated call ${updatedCall.sid} — task will be re-queued to workflow ${workflowSid}`);
+        return callback(null, response);
+    } catch (e) {
+        console.error(`[ColdTransfer] Failed to update call ${CallSid} — caller may be stuck on original task ${TaskSid}`);
+        console.error(`[ColdTransfer] Target workflow: ${workflowSid}, TwiML attempted: ${twimlString}`);
+        console.error(`[ColdTransfer] Error:`, e?.message ?? e);
         response.setStatusCode(500);
         return callback(null, response);
     }
-})
+});
