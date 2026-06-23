@@ -51,4 +51,3 @@ This Function uses the Flex Token Validator library, as explained this in this [
 
 ## Disclaimer
 This software is to be considered "sample code", a Type B Deliverable, and is delivered "as-is" to the user. Twilio bears no responsibility to support the use or implementation of this software.
-ponsibility to support the use or implementation of this software.
